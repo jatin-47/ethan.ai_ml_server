@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}
+    Upload Data
+{% endblock %}
+
+{% block body %}
+    <div class="container text-center">
+        <h1 class="mt-4 mb-5">Upload Training Data</h1>
+        <form action="{% url 'upload' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div>
+                <label for="id_csv" class="form-label fs-5">Clients Data:</label>
+                <input type="file" class="form-control" name="pos_csv" accept=".csv" id="id_csv" required>
+            </div>
+            <br> 
+            {% if error %}
+                <div class="alert alert-danger" id="error">
+                    {% for err in error %}
+                        {{err}}<br>
+                    {% endfor %}
+                    <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">report_date</th>
+                            <th scope="col">client_id</th>
+                            <th scope="col">asset_class</th>
+                            <th scope="col">unrealisedpl</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in null_rows %}
+                            <tr>
+                                <th scope="row">{{ row.report_date }}</th>
+                                <td>{{ row.client_id }}</td>
+                                <td>{{ row.asset_class }}</td>
+                                <td>{{ row.unrealisedpl }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                      </table>
+                </div>
+            {% endif %}
+            <button type="submit" class="btn btn-primary" id="upload">UPLOAD</button>
+        </form>
+
+        <div class="load justify-content-center" style="display: none;">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <br>
+            <span>Validating Data...</span>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.querySelector('.load').style.display = 'flex';
+            document.getElementById('upload').style.display = 'none';
+            if (document.getElementById("error"))
+            document.getElementById("error").innerHTML = "";
+            this.submit();
+        });
+    });
+</script>
+{% endblock %}

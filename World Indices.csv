@@ -1,0 +1,38 @@
+Country,Index
+United States of America,^GSPC
+China,000001.SS
+United Kingdom,^FTSE
+Germany,^GDAXI
+United States,^GSPC
+Hong Kong,^HSI
+Taiwan,^TWII
+Argentina,^MERV
+Ireland,^ISEQ
+Singapore,^STI
+Canada,^GSPTSE
+U.S.,^GSPC
+India,^BSESN
+France,^FCHI
+Netherlands,^AEX
+Korea,^KS11
+Brazil,^BVSP
+Spain,^IBEX
+Bermuda,BSX
+Cayman Islands,0322.HK
+Indonesia,^JKSE
+Thailand,^SET.BK
+Australia,^AXJO
+Belgium,^BFX
+Switzerland,^SSMI
+Sweden,^OMXSBCAPPI
+Japan,^N225
+Russian Federation,IMOEX.ME
+Austria,^ATX
+Korea - the Republic of,^KS11
+Finland,^OMXHBCAPPI
+Norway,^OSEAX
+Euro Member Countries,^N100
+Macao,^STI
+Uruguay,^MERV
+Italy,^BIT40P
+South Africa,JSE.JO

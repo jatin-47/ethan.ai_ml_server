@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block link %}
+<script src="{% static 'multiselect-dropdown.js' %}"></script>
+{% endblock %}
+
+{% block title %}
+Preview Uploaded Data
+{% endblock %}
+
+{% block body %}
+<div class="container text-center">
+    <h1 class="mt-4 mb-5">Preview Uploaded Training Data</h1>
+    <form class="col gy-2 gx-5 align-items-center" action="{% url 'model_train' %}" method="POST">
+        {% csrf_token %}
+        <div class="col-auto">
+            <label for="clients" class="form-label fs-5">Select the client(s) to train the model for:</label><br>
+            <select class="form-select" style="width: 150px;" name="client_id" id="clients" multiple required
+                oninvalid="check_ids()" multiselect-search="true" multiselect-select-all="true"
+                multiselect-max-items="2">
+                {% for client_option in client_options %}
+                <option value="{{client_option}}">{{client_option}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <br>
+
+        {% if error %}
+        <div class="alert alert-warning" class="error">{{error}}</div>
+        {% endif %}
+
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary" id="train">TRAIN</button>
+        </div>
+        <div class="col-auto">
+            <p class="error" style="color: red;"></p>
+        </div>
+    </form>
+
+    <div class="load justify-content-center" style="display: none;">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelector('form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            document.querySelector('.load').style.display = 'flex';
+            document.getElementById('train').style.display = 'none';
+            var error = document.getElementsByClassName("error");
+            for (var i = 0; i < error.length; i++) {
+                error[i].innerHTML = "";
+            }
+            this.submit();
+        });
+    });
+
+    function check_ids() {
+        var client_ids = document.getElementById("clients");
+        var error = document.getElementById("error");
+        if (client_ids.selectedOptions.length == 0) {
+            error.innerHTML = "Select atleast one client";
+            return false;
+        }
+        else {
+            error.innerHTML = "";
+            return true;
+        }
+    }
+</script>
+{% endblock %}

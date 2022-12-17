@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block body %}
+
+<div class="container text-center">
+
+    <h1 class="mt-4 mb-5">Dashboard</h1>
+
+    <a href="{% url 'upload' %}" class="btn btn-info">Upload Data for Training</a>
+    <a href="{% url 'model_predict' %}" class="btn btn-info">See Predictions</a>
+
+</div>
+{% endblock %}
+
+
+{% block script %}
+{% endblock %}

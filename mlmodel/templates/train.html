@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}
+Training Successful
+{% endblock %}
+
+{% block body %}
+
+    <div class="container text-center">
+        <h1 class="mt-4 mb-4">Training Stats</h1>
+        <p>Time taken : {{time}}</p>
+        <a href="{% url 'model_predict' %}" class="btn btn-info">Do Predictions</a>
+        <p class="fs-4 mt-1">Testing Accuracies of all the target variables considering (80%-20%) split, are: </p>
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Client ID</th>
+                <th scope="col">invested_amount</th>
+                <th scope="col">loan_to_invest_ratio</th>
+                <th scope="col">lowriskbucket_ratio</th>
+                <th scope="col">mediumriskbucket_ratio</th>
+                <th scope="col">highriskbucket_ratio</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for client in clients %}
+                <tr>
+                    <th scope="row">{{ client.id }}</th>
+                    <td>{{ client.invested_amount }}</td>
+                    <td>{{ client.loan_to_invest_ratio }}</td>
+                    <td>{{ client.lowriskbucket_ratio }}</td>
+                    <td>{{ client.mediumriskbucket_ratio }}</td>
+                    <td>{{ client.highriskbucket_ratio }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+       
+    </div>
+
+{% endblock %}

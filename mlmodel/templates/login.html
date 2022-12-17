@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+    
+{% block body %}
+
+{% if user.is_authenticated %}
+{% else %}
+<main class="login d-flex flex-column justify-content-center align-items-center text-center">
+    <h1 class="heading">LogIn</h1>
+    <form action="{% url 'login' %}" method="post" class="d-flex flex-column justify-content-center align-items-center col gy-2 gx-5">
+        {% csrf_token %}
+        
+        {% if message %}
+        <div class="msg col-auto">{{ message }}</div>
+        {% endif %}
+        <div class="userwithicon col-auto">
+            <input autofocus class="username" type="text" name="username" placeholder="Username" required>
+            <i class="fa fa-user"></i>
+        </div>
+        <div class="passwithicon col-auto">
+            <input class="password" type="password" name="password" placeholder="Password" required>
+            <i class="fa fa-lock"></i>
+        </div>
+        <input class="button col-auto" type="submit" value="LogIn" >
+        <span class="col-auto">Don't have an account? <a href="{% url 'register' %}">Register here.</a></span> 
+    </form>
+    
+</main>
+{% endif %}
+
+{% endblock %}

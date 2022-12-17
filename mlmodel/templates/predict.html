@@ -1,0 +1,188 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block link %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="{% static 'multiselect-dropdown.js' %}"></script>
+
+<style>
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    .client_id {
+        cursor: pointer;
+    }
+
+    .active {
+        color: brown;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block title %}
+Results
+{% endblock %}
+
+{% block body %}
+
+ 
+    <div class="container">
+        <h1 class="p-2 mb-1 text-center border-bottom">Predictions</h1>
+     
+        <form class="row gy-2 gx-5 align-items-center" action="{% url 'model_predict' %}" method="get">
+            <div class="col-auto">
+                <label for="clients" class="form-label">Client IDs</label><br>
+                <select class="form-select" style="width: 150px;" name="client_id" id="clients" multiple required
+                    oninvalid="check_ids()" multiselect-search="true" multiselect-select-all="true"
+                    multiselect-max-items="2">
+                    {% for client_option in client_options %}
+                        <option value="{{client_option}}">{{client_option}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- <div class="col-auto">
+                <label for="last_days" class="form-label">Last Days</label>
+                <input type="number" class="form-control" name="last_days" id="last_days" min="1" max="60" value="1">
+            </div>
+
+            <div class="col-auto">
+                <label for="start_date" class="form-label">Start Date</label>
+                <input type="date" class="form-control" name="start_date" id="start_date">
+            </div>
+
+            <div class="col-auto">
+                <label for="last_date" class="form-label">End Date</label>
+                <input type="date" class="form-control" name="last_date" id="last_date">
+            </div> -->
+
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Predict</button>
+            </div>
+            <div class="col-auto">
+                <p id="error" style="color: red;"></p>
+            </div>
+        </form>
+        <hr>
+
+        <div class="load justify-content-center" style="display: none; margin-top: 150px;">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        {% if show_pred %}
+        <div class="row" id="predictions">
+            <p class="text-center">Time taken : {{time}}</p>
+
+            <div class="col-md-2" style="border-right: solid;">
+                <ul id="client_list">
+                    {% for client in clients %}
+                    <li class="client_id" onclick="show_plots()" data-clientid="{{client}}">Client {{client}}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-10 overflow-auto" style="height: 85vh;">
+                {% for plot_div in plot_divs %}
+                <div id="client_{{ plot_div.1 }}" class="plots" style="display: none;">
+                    <div class="d-flex flex-row align-items-center justify-content-between flex-wrap">
+                        <h2 class="heading">Client {{plot_div.1}}</h2>
+                        <div>
+                            <div>Start Date : {{plot_div.2.year}}-{{plot_div.2.month}}-{{plot_div.2.day}}</div>  
+                            <div>End Date : {{plot_div.3.year}}-{{plot_div.3.month}}-{{plot_div.3.day}}</div>  
+                            <div>Working Days : {{plot_div.4}}</div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div id="five_plots" class="d-flex justify-content-around flex-wrap">
+                        {% for plot in plot_div.0|slice:":-1" %}
+                        <div class="plot p-2">
+                            {{plot|safe}}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <hr>
+                    <div id="last_plot">
+                        <div class="d-flex justify-content-around flex-wrap">
+                            {{plot_div.0|last|safe}}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="text-align: center;">No data!</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        <br>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelector('form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (document.getElementById('predictions'))
+                document.getElementById('predictions').style.display = 'none';
+            document.querySelector('.load').style.display = 'flex';
+            document.getElementById("error").innerHTML = "";
+            this.submit();
+        });
+
+        var first_client = document.getElementById("client_list").children[0];
+        first_client.click();
+    });
+
+    function show_plots() {
+        var client_id = event.target.dataset.clientid;
+        var plots = document.getElementsByClassName("plots");
+        for (var i = 0; i < plots.length; i++) {
+            plots[i].style.display = "none";
+        }
+        var plot = document.getElementById("client_" + client_id);
+        plot.style.display = "block";
+
+        var other_clients = document.getElementsByClassName("client_id");
+        for (var i = 0; i < other_clients.length; i++) {
+            other_clients[i].classList.remove("active");
+        }
+        event.target.classList.add("active");
+    }
+
+    function check_ids() {
+        var client_ids = document.getElementById("clients");
+        var error = document.getElementById("error");
+        if (client_ids.selectedOptions.length == 0) {
+            error.innerHTML = "Select atleast one client";
+            return false;
+        }
+        else {
+            error.innerHTML = "";
+            return true;
+        }
+    }
+    
+    Date.prototype.toDateInputValue = (function () {
+        var local = new Date(this);
+        local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+        return local.toJSON().slice(0, 10);
+    });
+    // document.getElementById('start_date').value = new Date().toDateInputValue();
+    document.getElementById('last_date').value = new Date().toDateInputValue();
+
+</script>
+{% endblock %}
